@@ -1,0 +1,137 @@
+:root {
+  --color-brand--1: #ffb545;
+  --color-brand--2: #00c46a;
+
+  --color-dark--1: #2d3439;
+  --color-dark--2: #42484d;
+  --color-light--1: #aaa;
+  --color-light--2: #ececec;
+  --color-light--3: rgb(214, 222, 224);
+}
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+html {
+  font-size: 62.5%;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  height: 100vh;
+  padding: 2.5rem;
+  font-weight: 400;
+  line-height: 1.6;
+  background-color: #fff;
+  overscroll-behavior-y: none;
+  color: var(--color-light--2);
+  font-family: 'Manrope', sans-serif;
+}
+
+/* GENERAL */
+a:link,
+a:visited {
+  text-decoration: none;
+  color: var(--color-brand--1);
+}
+
+/* SIDEBAR */
+.sidebar {
+  display: flex;
+  flex-basis: 50rem;
+  flex-direction: column;
+  padding: 3rem 5rem 4rem 5rem;
+  background-color: var(--color-dark--1);
+}
+
+.logo {
+  height: 5.2rem;
+  align-self: center;
+  margin-bottom: 4rem;
+}
+
+.form {
+  display: grid;
+  height: 9.25rem;
+  border-radius: 5px;
+  gap: 0.5rem 2.5rem;
+  margin-bottom: 1.75rem;
+  padding: 1.5rem 2.75rem;
+  grid-template-columns: 1fr 1fr;
+  transition: all 0.5s, transform 1ms;
+  background-color: var(--color-dark--2);
+}
+
+.form.hidden {
+  height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  padding: 0 2.25rem;
+  transform: translateY(-30rem);
+}
+
+.form__row {
+  display: flex;
+  align-items: center;
+}
+
+.form__row--hidden {
+  display: none;
+}
+
+.form__label {
+  flex: 0 0 50%;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.form__input {
+  width: 100%;
+  border: none;
+  font-size: 1.4rem;
+  border-radius: 3px;
+  font-family: inherit;
+  transition: all 0.2s;
+  padding: 0.3rem 1.1rem;
+  background-color: var(--color-light--3);
+}
+
+.form__input:focus {
+  outline: none;
+  background-color: #fff;
+}
+
+.form__btn {
+  display: none;
+}
+
+.copyright {
+  margin-top: auto;
+  font-size: 1.3rem;
+  text-align: center;
+  color: var(--color-light--1);
+}
+
+.attribution-link:link,
+.attribution-link:visited {
+  color: var(--color-brand--2);
+  transition: all 0.2s;
+}
+
+.attribution-link:hover,
+.attribution-link:active {
+  color: var(--color-light--2);
+}
+
+/* MAP */
+#map {
+  flex: 1;
+  height: 100%;
+  background-color: var(--color-light--1);
+}
