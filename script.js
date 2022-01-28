@@ -12,18 +12,15 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 const yearEl = document.querySelector('.year');
 
-///////////////////////////////////
 // Update copyright year in footer
-const currentYear = new Date().getFullYear();
+yearEl.textContent = new Date().getFullYear();
 
-yearEl.textContent = currentYear;
-
+// Retrieve current geolocation and render map
 if (navigator.geolocation)
   navigator.geolocation.getCurrentPosition(
     function (position) {
       const { latitude } = position.coords;
       const { longitude } = position.coords;
-
       const coords = [latitude, longitude];
 
       const map = L.map('map').setView(coords, 13);
@@ -33,12 +30,24 @@ if (navigator.geolocation)
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      L.marker(coords)
-        .addTo(map)
-        .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-        .openPopup();
+      // On mouse click: add marker with popup to map
+      map.on('click', function (mapEvent) {
+        L.marker(mapEvent.latlng)
+          .addTo(map)
+          .bindPopup(
+            L.popup({
+              maxWidth: 250,
+              minWidth: 100,
+              autoClose: false,
+              closeOnClick: false,
+              className: 'running-popup',
+            })
+          )
+          .setPopupContent('Workout')
+          .openPopup();
+      });
     },
     function () {
-      alert('Could not get your position');
+      alert('Can not retrieve current location.');
     }
   );
