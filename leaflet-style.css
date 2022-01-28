@@ -1,0 +1,24 @@
+/* Popup width is defined in JS using options */
+
+.leaflet-popup-content-wrapper {
+  color: var(--color-light--2);
+  border-radius: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-dark--1);
+}
+
+.leaflet-popup-content {
+  font-size: 1.5rem;
+}
+
+.running-popup .leaflet-popup-content-wrapper {
+  border-left: 0.5rem solid var(--color-brand--2);
+}
+
+.cycling-popup .leaflet-popup-content-wrapper {
+  border-left: 0.5rem solid var(--color-brand--1);
+}
