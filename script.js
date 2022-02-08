@@ -127,9 +127,7 @@ class App {
           className: `${workout.name}-popup`,
         })
       )
-      .setPopupContent(
-        `${workout.name === 'running' ? '🏃🏽‍♂️' : '🚴‍♀️'} ${workout.description}`
-      )
+      .setPopupContent(`${workout.workoutIcon} ${workout.description}`)
       .openPopup();
   }
 
@@ -138,9 +136,7 @@ class App {
       <li class="workout workout--${workout.name}" data-id="${workout.id}">
         <h2 class="workout__title">${workout.description}</h2>
         <div class="workout__details">
-          <span class="workout__icon">${
-            workout.name === 'running' ? '🏃🏽‍♂️ ' : '🚴‍♀️ '
-          }</span>
+          <span class="workout__icon">${workout.workoutIcon}</span>
           <span class="workout__value">${workout.distance}</span>
           <span class="workout__unit">km</span>
         </div>
@@ -204,6 +200,7 @@ class Workout {
     this.description = `${this.name[0].toUpperCase() + this.name.slice(1)} on ${
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
+    this.workoutIcon = `${this.name === 'running' ? '🏃‍♂️' : '🚴‍♀️'}`;
   }
 }
 
@@ -212,7 +209,7 @@ class Running extends Workout {
 
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
-    this.cadence = cadence;
+    this.cadence = cadence; // steps/min
     this.pace = this.calcPace();
     this._setDescription();
   }
@@ -238,6 +235,3 @@ class Cycling extends Workout {
 }
 
 const app = new App();
-// const running1 = new Running([-27, 152], 10, 100, 80);
-// const cycling1 = new Cycling([-27, 152], 50, 200, 325);
-// console.log(running1, cycling1);
