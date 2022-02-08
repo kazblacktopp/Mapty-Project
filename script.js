@@ -15,10 +15,16 @@ yearEl.textContent = new Date().getFullYear();
 class App {
   #map;
   #mapEvent;
-  #workouts = [];
+  // #workouts = [];
+  #runningWorkouts = [];
+  #cyclingWorkouts = [];
+  #mapZoomLevel = 13;
 
   constructor() {
     this._getPosition();
+
+    this._getLocalStorage();
+
     inputType.addEventListener('change', this._toggleElevationField);
     form.addEventListener('submit', this._newWorkout.bind(this));
   }
@@ -37,14 +43,19 @@ class App {
     const { latitude, longitude } = position.coords;
     const coords = [latitude, longitude];
 
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    this.#map.on('click', this._showForm.bind(this));
+    this.#map.on('click', this._showForm.bind(this)); // .on() used because Leaflet maps require jQuery methods
+
+    if (this.#runningWorkouts.length != 0)
+      this.#runningWorkouts.forEach(workout => this._displayMarker(workout));
+    if (this.#cyclingWorkouts.length != 0)
+      this.#cyclingWorkouts.forEach(workout => this._displayMarker(workout));
   }
 
   _showForm(mapE) {
@@ -81,7 +92,10 @@ class App {
         !isPositive(distance, duration, cadence)
       )
         return alert('Inputs must be valid numbers!');
-      workout = new Running([lat, lng], distance, duration, cadence);
+      else {
+        workout = new Running([lat, lng], distance, duration, cadence);
+        this.#runningWorkouts.push(workout);
+      }
     }
 
     // If workout is cycling, create new Cycling object
@@ -93,11 +107,14 @@ class App {
         !isPositive(distance, duration)
       )
         return alert('Inputs must be valid numbers!');
-      workout = new Cycling([lat, lng], distance, duration, elevation);
+      else {
+        workout = new Cycling([lat, lng], distance, duration, elevation);
+        this.#cyclingWorkouts.push(workout);
+      }
     }
 
     // Add new object to workout array
-    this.#workouts.push(workout);
+    // this.#workouts.push(workout);
 
     // Display workout marker on map
     this._displayMarker(workout);
@@ -107,12 +124,8 @@ class App {
 
     // Clear and hide form
     this._resetForm();
-  }
 
-  _resetForm() {
-    form.classList.add('hidden');
-    if (inputType.value === 'cycling') this._toggleElevationField();
-    form.reset();
+    this._setLocalStorage();
   }
 
   _displayMarker(workout) {
@@ -122,8 +135,6 @@ class App {
         L.popup({
           maxWidth: 250,
           minWidth: 100,
-          autoClose: false,
-          closeOnClick: false,
           className: `${workout.name}-popup`,
         })
       )
@@ -180,6 +191,42 @@ class App {
     }
 
     form.insertAdjacentHTML('afterend', html);
+  }
+
+  _resetForm() {
+    form.classList.add('hidden');
+    if (inputType.value === 'cycling') this._toggleElevationField();
+    form.reset();
+  }
+
+  _setLocalStorage() {
+    if (this.#runningWorkouts.length != 0)
+      localStorage.setItem('running', JSON.stringify(this.#runningWorkouts));
+    if (this.#cyclingWorkouts.length != 0)
+      localStorage.setItem('cycling', JSON.stringify(this.#cyclingWorkouts));
+  }
+
+  _getLocalStorage() {
+    const localStorageRunning = JSON.parse(localStorage.getItem('running'));
+    const localStorageCycling = JSON.parse(localStorage.getItem('cycling'));
+
+    if (localStorageRunning) {
+      localStorageRunning.forEach(workout => {
+        const running = new Running('');
+        Object.assign(running, workout);
+        this.#runningWorkouts.push(running);
+        this._displayWorkout(running);
+      });
+    }
+
+    if (localStorageCycling) {
+      localStorageCycling.forEach(workout => {
+        const cycling = new Cycling('');
+        Object.assign(cycling, workout);
+        this.#cyclingWorkouts.push(cycling);
+        this._displayWorkout(cycling);
+      });
+    }
   }
 }
 
