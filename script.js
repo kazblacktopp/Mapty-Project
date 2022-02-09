@@ -15,7 +15,7 @@ yearEl.textContent = new Date().getFullYear();
 class App {
   #map;
   #mapEvent;
-  // #workouts = [];
+  #workouts = [];
   #runningWorkouts = [];
   #cyclingWorkouts = [];
   #mapZoomLevel = 13;
@@ -27,6 +27,9 @@ class App {
 
     inputType.addEventListener('change', this._toggleElevationField);
     form.addEventListener('submit', this._newWorkout.bind(this));
+
+    // Place event handler on workout elements
+    containerWorkouts.addEventListener('click', this._goToWorkout.bind(this));
   }
 
   _getPosition() {
@@ -52,10 +55,10 @@ class App {
 
     this.#map.on('click', this._showForm.bind(this)); // .on() used because Leaflet maps require jQuery methods
 
-    if (this.#runningWorkouts.length != 0)
-      this.#runningWorkouts.forEach(workout => this._displayMarker(workout));
-    if (this.#cyclingWorkouts.length != 0)
-      this.#cyclingWorkouts.forEach(workout => this._displayMarker(workout));
+    if (this.#workouts.length != 0)
+      this.#workouts.forEach(workout => {
+        this._displayMarker(workout);
+      });
   }
 
   _showForm(mapE) {
@@ -114,13 +117,16 @@ class App {
     }
 
     // Add new object to workout array
-    // this.#workouts.push(workout);
+    this.#workouts.push(workout);
+
+    // Display workout on list
+    this._displayWorkout(workout);
 
     // Display workout marker on map
     this._displayMarker(workout);
 
-    // Display workout on list
-    this._displayWorkout(workout);
+    // Pan map to new workout marker
+    this._panMap(workout);
 
     // Clear and hide form
     this._resetForm();
@@ -209,24 +215,48 @@ class App {
   _getLocalStorage() {
     const localStorageRunning = JSON.parse(localStorage.getItem('running'));
     const localStorageCycling = JSON.parse(localStorage.getItem('cycling'));
+    let workout;
 
     if (localStorageRunning) {
-      localStorageRunning.forEach(workout => {
-        const running = new Running('');
-        Object.assign(running, workout);
-        this.#runningWorkouts.push(running);
-        this._displayWorkout(running);
+      localStorageRunning.forEach(workoutObj => {
+        workout = new Running('');
+        Object.assign(workout, workoutObj);
+        this.#runningWorkouts.push(workout);
+        this.#workouts.push(workout);
+        this._displayWorkout(workout);
       });
     }
 
     if (localStorageCycling) {
-      localStorageCycling.forEach(workout => {
-        const cycling = new Cycling('');
-        Object.assign(cycling, workout);
-        this.#cyclingWorkouts.push(cycling);
-        this._displayWorkout(cycling);
+      localStorageCycling.forEach(workoutObj => {
+        workout = new Cycling('');
+        Object.assign(workout, workoutObj);
+        this.#cyclingWorkouts.push(workout);
+        this.#workouts.push(workout);
+        this._displayWorkout(workout);
       });
     }
+  }
+
+  _panMap(workout) {
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      duration: 1,
+    });
+  }
+
+  _goToWorkout(e) {
+    const workoutEl = e.target.closest('.workout');
+
+    if (!workoutEl) return;
+
+    this.#workouts.forEach(workoutObj => {
+      if (workoutObj.id === workoutEl.dataset.id) {
+        const workout = workoutObj;
+        this._displayMarker(workout);
+        this._panMap(workout);
+      }
+    });
   }
 }
 
